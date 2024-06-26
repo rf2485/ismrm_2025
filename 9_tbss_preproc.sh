@@ -28,7 +28,7 @@ done
 
 cd tbss
 # using fsl
-module load fsl/6.0.4
+module load fsl/6.0.7
 tbss_1_preproc *.nii.gz
 firefox FA/slicesdir/index.html
 
