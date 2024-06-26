@@ -43,12 +43,12 @@ singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif dwidenoise -
 singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrconvert $intdir/1_dwi_denoised.mif -json_export $intdir/1_dwi_denoised.json -export_grad_fsl $intdir/1_dwi_denoised.bvec $intdir/1_dwi_denoised.bval $intdir/1_dwi_denoised.nii
 mv $intdir/1_dwi_denoised.mif $designerdir/working.mif
 
-singularity exec --nv --bind $basedir $basedir/designer2_latest.sif designer -degibbs $intdir/1_dwi_denoised.nii $intdir/2_dwi_degibbs.nii
-cp $intdir/1_dwi_denoised.json $intdir/2_dwi_degibbs.json
-singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrconvert -json_import $intdir/2_dwi_degibbs.json -fslgrad $intdir/2_dwi_degibbs.bvec $intdir/2_dwi_degibbs.bval $intdir/2_dwi_degibbs.nii $designerdir/working.mif -force
+# singularity exec --nv --bind $basedir $basedir/designer2_latest.sif designer -degibbs $intdir/1_dwi_denoised.nii $intdir/2_dwi_degibbs.nii
+# cp $intdir/1_dwi_denoised.json $intdir/2_dwi_degibbs.json
+# singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrconvert -json_import $intdir/2_dwi_degibbs.json -fslgrad $intdir/2_dwi_degibbs.bvec $intdir/2_dwi_degibbs.bval $intdir/2_dwi_degibbs.nii $designerdir/working.mif -force
 
 singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif dwiextract -bzero $designerdir/working.mif - | singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrconvert - -coord 3 0 -axes 0,1,2 $intdir/b0_1_degibbs.mif
-singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrconvert -export_pe_table $synb0in/acqparams.txt $intdir/b0_1_degibbs.mif $synb0in/b0.nii.gz
+singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrconvert -export_pe_table $synb0in/acqparams.txt $intdir/b0_1_degibbs.mif $synb0in/b0.nii.gz -force
 echo " 0 1 0 0.000" >> $synb0in/acqparams.txt
 cp $rawT1.nii.gz $synb0in/T1.nii.gz
 singularity run -e -B $synb0in:/INPUTS -B $synb0out:/OUTPUTS -B $basedir/license.txt:/extra/freesurfer/license.txt $basedir/synb0-disco_v3.1.sif
