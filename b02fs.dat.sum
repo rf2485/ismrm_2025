@@ -1,0 +1,111 @@
+7.4.1
+setenv SUBJECTS_DIR /Volumes/Research/lazarm03lab/labspace/AD/camcan995/derivatives/scd/designer_tbss/freesurfer
+cd /Volumes/Research/lazarm03lab/labspace/AD/camcan995/derivatives/scd/designer_tbss
+mri_segreg --mov ./tmp.bbregister.86313/template.nii --init-reg ./tmp.bbregister.86313/bbr.pass1.dat --out-reg b02fs.dat --interp trilinear --wm-proj-abs 2 --tol 1e-8 --tol1d 1e-3 --c0 0 --mincost b02fs.dat.mincost --dof 6 --nmax 36 --param b02fs.dat.param --surf white --brute -0.1 0.1 0.1 --cur-reg ./tmp.bbregister.86313/reg.curopt.dat --gm-proj-frac 0.5 --nsub 1 --gm-gt-wm 0.5 
+sysname  Darwin
+hostname ryns-imac.wireless.nyumc.org
+machine  x86_64
+user     rynflaherty
+movvol ./tmp.bbregister.86313/template.nii
+regfile ./tmp.bbregister.86313/bbr.pass1.dat
+subject sub-CC410032
+dof 6
+outregfile b02fs.dat
+UseMask 0
+UseLH 1
+UseRH 1
+nsubsamp 1
+PenaltySign  -1
+PenaltySlope 0.500000
+PenaltyCenter 0.000000
+surfname white
+GMProjFrac 0.500000
+WMProjAbs 2.000000
+lhcostfile (null)
+rhcostfile (null)
+interp  trilinear (1)
+frame  0
+TolPowell 0.000000
+nMaxItersPowell 36
+n1dmin  3
+Profile   0
+Gdiag_no  -1
+AddNoise  0 (0)
+SynthSeed 1724122692
+TransRandMax 0.000000
+RotRandMax 0.000000
+Translations 0.000000 0.000000 0.000000
+Rotations   0.000000 0.000000 0.000000
+Input reg
+ 0.99921   0.02568   0.03035   1.28742;
+-0.02947  -0.03393   0.99899   11.62924;
+ 0.02668  -0.99909  -0.03315  -17.15340;
+ 0.00000   0.00000   0.00000   1.00000;
+
+Initial costs ----------------
+Number of surface hits 226505
+WM  Intensity0   228.7537 +/-  85.6226
+Ctx Intensity0   305.2176 +/- 114.3024
+Pct Contrast0     28.3314 +/-  19.4932
+Cost   0.1339
+RelCost   0.1352
+
+Brute force preopt -0.1 0.1 0.1, n = 729
+     0  -0.1000  -0.1000  -0.1000  -0.1000  -0.1000  -0.1000      0.1270   0.1270  0.0
+     1  -0.1000  -0.1000  -0.1000  -0.1000  -0.1000   0.0000      0.1251   0.1251  0.0
+     3  -0.1000  -0.1000  -0.1000  -0.1000   0.0000  -0.1000      0.1248   0.1248  0.0
+     4  -0.1000  -0.1000  -0.1000  -0.1000   0.0000   0.0000      0.1232   0.1232  0.0
+     5  -0.1000  -0.1000  -0.1000  -0.1000   0.0000   0.1000      0.1232   0.1232  0.0
+     7  -0.1000  -0.1000  -0.1000  -0.1000   0.1000   0.0000      0.1225   0.1225  0.0
+    15  -0.1000  -0.1000  -0.1000   0.0000   0.1000  -0.1000      0.1221   0.1221  0.0
+    31  -0.1000  -0.1000   0.0000  -0.1000   0.0000   0.0000      0.1217   0.1217  0.0
+    32  -0.1000  -0.1000   0.0000  -0.1000   0.0000   0.1000      0.1213   0.1213  0.0
+    34  -0.1000  -0.1000   0.0000  -0.1000   0.1000   0.0000      0.1213   0.1213  0.0
+    39  -0.1000  -0.1000   0.0000   0.0000   0.0000  -0.1000      0.1211   0.1211  0.0
+    42  -0.1000  -0.1000   0.0000   0.0000   0.1000  -0.1000      0.1209   0.1209  0.0
+    67  -0.1000  -0.1000   0.1000   0.0000   0.0000   0.0000      0.1205   0.1205  0.0
+    68  -0.1000  -0.1000   0.1000   0.0000   0.0000   0.1000      0.1198   0.1198  0.0
+   114  -0.1000   0.0000   0.0000  -0.1000   0.1000  -0.1000      0.1197   0.1197  0.0
+   121  -0.1000   0.0000   0.0000   0.0000   0.0000   0.0000      0.1191   0.1191  0.0
+   148  -0.1000   0.0000   0.1000   0.0000   0.0000   0.0000      0.1189   0.1189  0.0
+   283   0.0000  -0.1000   0.0000   0.0000   0.0000   0.0000      0.1189   0.1189  0.0
+   284   0.0000  -0.1000   0.0000   0.0000   0.0000   0.1000      0.1188   0.1188  0.0
+   301   0.0000  -0.1000   0.1000  -0.1000   0.0000   0.0000      0.1184   0.1184  0.0
+   355   0.0000   0.0000   0.0000  -0.1000   0.0000   0.0000      0.1180   0.1180  0.0
+   364   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000      0.1161   0.1161  0.0
+
+Final costs ----------------
+Number of surface hits 226505
+WM  Intensity0   228.2336 +/-  84.5965
+Ctx Intensity0   304.5197 +/- 112.1593
+Pct Contrast0     28.3804 +/-  19.3085
+Cost   0.1312
+RelCost   0.1352
+Number of iterations     4
+Min cost was 0.131180
+RelMinCost   0.1325
+Number of FunctionCalls   334
+OptimizationTime 16.750250 sec
+Parameters at optimum (transmm, rotdeg)
+-0.04552 -0.05757  0.08838 -0.03717  0.13791  0.05744 
+Number of surface hits 226505
+WM  Intensity   228.2336 +/-  84.5965
+Ctx Intensity   304.5197 +/- 112.1593
+Pct Contrast     28.3804 +/-  19.3085
+Cost at optimum   0.1312
+RelCostOptimum   0.1325
+nhits= 226505 wmmn=  228.2336 wmstd= 84.5965 constd=   19.3085 ctxmn=  304.5197 ctxstd=112.1593 conmn =  28.3804 costmn =   0.1312 
+#C#  -0.046  -0.058   0.088 -0.037  0.138  0.057 0.000000 0.000000 0.131180 228.233558 304.519706 28.380387 0.000000 0.500000     1 0
+Reg at min cost was 
+ 0.99930   0.02331   0.02927   1.18895;
+-0.02845  -0.03456   0.99900   11.56179;
+ 0.02430  -0.99913  -0.03387  -17.07561;
+ 0.00000   0.00000   0.00000   1.00000;
+
+Original Reg - Optimal Reg
+-0.00009   0.00237   0.00108   0.09847;
+-0.00102   0.00062  -0.00001   0.06746;
+ 0.00239   0.00004   0.00072  -0.07779;
+ 0.00000   0.00000   0.00000   0.00000;
+
+Surface-RMS-Diff-mm 0.153575 0.072463 0.303076
