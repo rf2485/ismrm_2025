@@ -15,7 +15,7 @@ j=${subj_list[$subj_num]}
 
 rawdwi=$basedir/raw/$j/dwi/${j}_dwi
 rawT1=$basedir/raw/$j/anat/${j}_T1w
-designerdir=$projectdir/designer_new_eddy/$j/
+designerdir=$projectdir/designer_new_eddy_no_akc/$j/
 intdir=$designerdir/intermediate_nifti/
 mkdir -p $intdir
 synb0in=$designerdir/synb0/INPUTS/
@@ -114,7 +114,7 @@ cp eddy_mask.nii $qc_eddy/eddy_mask.nii
 
 #rician bias correction, smoothing, and model fitting with pydesigner
 cd $designerdir
-singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif pydesigner -s --akc --resume --verbose -o $designerdir $rawdwi.nii.gz
+singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif pydesigner -s --resume --verbose -o $designerdir $rawdwi.nii.gz
 singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif tensor2metric $designerdir/metrics/DT.nii -vector $designerdir/metrics/dti_V1.nii -modulate none -force
 
 rm -rf $designerdir/tmp/

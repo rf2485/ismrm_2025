@@ -15,7 +15,7 @@ j=${subj_list[$subj_num]}
 
 rawdwi=$basedir/raw/$j/dwi/${j}_dwi
 rawT1=$basedir/raw/$j/anat/${j}_T1w
-designerdir=$projectdir/designer_new_eddy/$j/
+designerdir=$projectdir/designer_b0norm/$j/
 intdir=$designerdir/intermediate_nifti/
 mkdir -p $intdir
 synb0in=$designerdir/synb0/INPUTS/
@@ -35,8 +35,8 @@ source $FSLDIR/etc/fslconf/fsl.sh
 singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrconvert -json_import $rawdwi.json -fslgrad $rawdwi.bvec $rawdwi.bval $rawdwi.nii.gz $designerdir/working.mif -force
 singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrconvert $designerdir/working.mif -json_export $designerdir/dwi_raw.json -export_grad_fsl $designerdir/dwi_raw.bvec $designerdir/dwi_raw.bval $designerdir/dwi_raw.nii -force
 
-#denoise, degibbs, and normalize with designer
-singularity exec --nv --bind $basedir $basedir/designer2_latest.sif designer -denoise -shrinkage frob -adaptive_patch -degibbs -normalize -nocleanup -scratch $designerdir/tmp $designerdir/dwi_raw.nii $intdir/2_dwi_degibbs.nii
+#denoise and degibbs with designer
+singularity exec --nv --bind $basedir $basedir/designer2_latest.sif designer -denoise -shrinkage frob -adaptive_patch -degibbs -nocleanup -scratch $designerdir/tmp $designerdir/dwi_raw.nii $intdir/2_dwi_degibbs.nii
 
 #move denoised files and calculate residual
 mv $designerdir/tmp/sigma.nii $designerdir/noisemap.nii
@@ -88,11 +88,11 @@ rm eddy_mask.nii.gz
 singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrconvert dwi.mif eddy_in.nii -strides -1,+2,+3,+4 -export_grad_fsl bvecs bvals -export_pe_eddy eddy_config.txt eddy_indices.txt
 
 #eddy
-eddy_cuda10.2 --imain=eddy_in.nii --mask=eddy_mask.nii --acqp=eddy_config.txt --index=eddy_indices.txt --bvecs=bvecs --bvals=bvals --topup=field --data_is_shelled --slm=linear --repol --cnr_maps --verbose --json=dwi.json --out=dwi_post_eddy
+eddy_cuda10.2 --imain=eddy_in.nii --mask=eddy_mask.nii --acqp=eddy_config.txt --index=eddy_indices.txt --bvecs=bvecs --bvals=bvals --topup=field --data_is_shelled --slm=linear --niter=8 --fwhm=10,6,4,2,0,0,0,0 --repol --cnr_maps --verbose --json=dwi.json --out=dwi_post_eddy
 
 #move and convert eddy output
 intermediate=$designerdir/intermediate_nifti/2_dwi_undistorted
-singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrconvert dwi_post_eddy.nii.gz $intermediate.mif -strides -1,2,3,4 -fslgrad dwi_post_eddy.eddy_rotated_bvecs bvals
+singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrconvert dwi_post_eddy.nii.gz $intermediate.mif -strides -1,2,3,4 -fslgrad dwi_post_eddy.eddy_rotated_bvecs bvals -json_import dwi.json
 singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrconvert -export_grad_fsl $intermediate.bvec $intermediate.bval -json_export $intermediate.json $intermediate.mif $intermediate.nii -force
 mv $intermediate.mif $designerdir/working.mif
 
@@ -112,12 +112,22 @@ cp dwi_post_eddy.eddy_movement_over_time $qc_eddy/eddy_movement_over_time
 cp dwi_post_eddy.eddy_mbs_first_order_fields.nii.gz $qc_eddy/eddy_mbs_first_order_fields.nii.gz
 cp eddy_mask.nii $qc_eddy/eddy_mask.nii
 
+#b0 normalization
+singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrconvert $designerdir/working.mif -coord 3 0:31 b1000_prenorm.mif
+singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrconvert $designerdir/working.mif -coord 3 32:end b2000_prenorm.mif
+series_list=( "b1000" "b2000" )
+idx=0
+for bval in "${series_list[@]}"; do
+	singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif dwiextract ${bval}_prenorm.mif - -bzero | singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrmath - mean - -axis 3 | singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrfilter -stdev 3 - smooth mean_bzero_prenorm_${idx}.mif
+	idx=$((idx+1))
+done
+singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrcalc mean_bzero_prenorm_0.mif mean_bzero_prenorm_1.mif -div - | singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrcalc b2000_prenorm.mif - -mult - | singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrcat -axis 3 b1000_prenorm.mif - dwi_norm.mif
+intermediate=$designerdir/intermediate_nifti/3_dwi_b0norm
+singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrconvert -export_grad_fsl $intermediate.bvec $intermediate.bval -json_import $intermediate.json dwi_norm.mif $intermediate.nii
+cp dwi_norm.mif $designerdir/working.mif
 #rician bias correction, smoothing, and model fitting with pydesigner
 cd $designerdir
-singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif pydesigner -s --akc --resume --verbose -o $designerdir $rawdwi.nii.gz
+singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif pydesigner -s --resume --verbose -o $designerdir $rawdwi.nii.gz
 singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif tensor2metric $designerdir/metrics/DT.nii -vector $designerdir/metrics/dti_V1.nii -modulate none -force
 
 rm -rf $designerdir/tmp/
-
-
-

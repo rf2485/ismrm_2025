@@ -15,7 +15,7 @@ j=${subj_list[$subj_num]}
 
 rawdwi=$basedir/raw/$j/dwi/${j}_dwi
 rawT1=$basedir/raw/$j/anat/${j}_T1w
-designerdir=$projectdir/designer_new_eddy/$j/
+designerdir=$projectdir/designer_new_eddy_dont_sep/$j/
 intdir=$designerdir/intermediate_nifti/
 mkdir -p $intdir
 synb0in=$designerdir/synb0/INPUTS/
@@ -88,7 +88,7 @@ rm eddy_mask.nii.gz
 singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrconvert dwi.mif eddy_in.nii -strides -1,+2,+3,+4 -export_grad_fsl bvecs bvals -export_pe_eddy eddy_config.txt eddy_indices.txt
 
 #eddy
-eddy_cuda10.2 --imain=eddy_in.nii --mask=eddy_mask.nii --acqp=eddy_config.txt --index=eddy_indices.txt --bvecs=bvecs --bvals=bvals --topup=field --data_is_shelled --slm=linear --repol --cnr_maps --verbose --json=dwi.json --out=dwi_post_eddy
+eddy_cuda10.2 --imain=eddy_in.nii --mask=eddy_mask.nii --acqp=eddy_config.txt --index=eddy_indices.txt --bvecs=bvecs --bvals=bvals --topup=field --data_is_shelled --slm=linear --niter=8 --fwhm=10,6,4,2,0,0,0,0 --repol --ol_type=both --dont_sep_offs_move --cnr_maps --verbose --json=dwi.json --out=dwi_post_eddy
 
 #move and convert eddy output
 intermediate=$designerdir/intermediate_nifti/2_dwi_undistorted
@@ -114,10 +114,11 @@ cp eddy_mask.nii $qc_eddy/eddy_mask.nii
 
 #rician bias correction, smoothing, and model fitting with pydesigner
 cd $designerdir
-singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif pydesigner -s --akc --resume --verbose -o $designerdir $rawdwi.nii.gz
+singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif pydesigner -s --resume --verbose -o $designerdir $rawdwi.nii.gz
 singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif tensor2metric $designerdir/metrics/DT.nii -vector $designerdir/metrics/dti_V1.nii -modulate none -force
 
 rm -rf $designerdir/tmp/
+
 
 
 
