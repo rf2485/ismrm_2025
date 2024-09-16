@@ -11,7 +11,7 @@
 
 basedir=/gpfs/data/lazarlab/CamCan995
 dirS=$basedir/raw
-outdir=$basedir/derivatives/camcan_scd_dMRI_paper/recon-all-clinical
+outdir=$basedir/derivatives/designer_tbss/freesurfer/
 
 mkdir -p $outdir
 
