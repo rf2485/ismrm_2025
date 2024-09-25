@@ -8,7 +8,7 @@
 #SBATCH --time=12:00:00
 #SBATCH --mem=32G
 #SBATCH --array=1-325
-#SBATCH -o ./slurm_output/8_process_dwi/slurm-%A_%a.out
+#SBATCH -o ./slurm_output/7_process_dwi/slurm-%A_%a.out
 
 basedir=/gpfs/data/lazarlab/CamCan995/
 projectdir=$basedir/derivatives/designer_tbss/
@@ -29,6 +29,7 @@ synb0out=$designerdir/synb0/OUTPUTS/
 mkdir -p $synb0out
 
 module load singularity/3.9.8
+module load freesurfer/7.4.1
 module load miniconda3/gpu/4.9.2
 source activate ~/.conda/envs/fsl_eddy/
 export FSLDIR=$CONDA_PREFIX
@@ -101,10 +102,16 @@ intermediate=$designerdir/intermediate_nifti/2_dwi_undistorted
 singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrconvert -export_grad_fsl $intermediate.bvec $intermediate.bval -json_export $intermediate.json dwi_applytopup.mif $intermediate.nii -force
 mv dwi_applytopup.mif $designerdir/working.mif
 
-#rician bias correction, smoothing, and model fitting with pydesigner
+#brain mask
+singularity exec --bind $basedir/ $basedir/neurodock_latest.sif dwiextract $designerdir/working.mif - -bzero | singularity exec --bind $basedir/ $basedir/neurodock_latest.sif mrmath - mean - -axis 3 | singularity exec --bind $basedir/ $basedir/neurodock_latest.sif mrconvert - meanb0.nii
+mri_synthstrip -i meanb0.nii -m new_brain_mask.nii
+
+#csf mask, csf-excluded smoothing, rician bias correction, and model fitting with pydesigner
 cd $designerdir
+mkdir -p $designerdir/metrics_qc/fitting
+singularity exec --bind $basedir/ $basedir/neurodock_latest.sif pydesigner --resume -n -u -cd 2 -z -r --fit_constraints 0,0,0 --akc --user_mask $designerdir/tmp/new_brain_mask.nii --verbose --noqc --nthreads 4 -o $designerdir/ $rawdwi.nii.gz
 rm -rf $designerdir/tmp/
-singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif pydesigner -s --resume --verbose --noqc --nthreads 4 -o $designerdir $rawdwi.nii.gz
+
 ##calculate colormap from diffusion tensor
 singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif tensor2metric $designerdir/metrics/DT.nii -vector $designerdir/metrics/dti_V1.nii -modulate none -force
 
