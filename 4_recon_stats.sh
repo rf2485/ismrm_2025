@@ -1,11 +1,16 @@
-export SUBJECTS_DIR=./
+basedir=/gpfs/data/lazarlab/CamCan995
+projectdir=$basedir/derivatives/designer_tbss/
+t1dir=$projectdir/freesurfer/
 
-cut -f1 anat_over_55.tsv > recon-all-clinical/subjectsfile.txt
-cd recon-all-clinical
+module load freesurfer/7.4.1
+export SUBJECTS_DIR=$t1dir
+
+cut -f1 $projectdir/anat_over_55.tsv > $t1dir/subjectsfile.txt
+cd $t1dir
 sed -i '' '1d' subjectsfile.txt
 
 #generate stats tables with Freesurfer
-aparcstats2table --subjectsfile=subjectsfile.txt --hemi lh --tablefile=lh_aparctable.tsv --measure=thickness --common-parcs
-aparcstats2table --subjectsfile=subjectsfile.txt --hemi rh --tablefile=rh_aparctable.tsv --measure=thickness --common-parcs
-asegstats2table --subjectsfile=subjectsfile.txt --tablefile=asegtable.tsv --common-segs
-asegstats2table --subjectsfile=subjectsfile.txt --stats=wmparc.stats --tablefile=wmparctable.tsv --common-segs
+aparcstats2table --subjectsfile=subjectsfile.txt --hemi lh --tablefile=lh_aparctable.tsv --measure=thickness --common-parcs --skip
+aparcstats2table --subjectsfile=subjectsfile.txt --hemi rh --tablefile=rh_aparctable.tsv --measure=thickness --common-parcs --skip
+asegstats2table --subjectsfile=subjectsfile.txt --tablefile=asegtable.tsv --common-segs --skip
+asegstats2table --subjectsfile=subjectsfile.txt --stats=wmparc.stats --tablefile=wmparctable.tsv --common-segs --skip

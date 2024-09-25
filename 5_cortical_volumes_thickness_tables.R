@@ -1,4 +1,4 @@
-#run synthseg, recon-all-clinical, and aparcstats2table first
+#run synthseg, freesurfer, and aparcstats2table first
 library(tidyverse)
 library(arsenal)
 
@@ -22,17 +22,17 @@ remove_outliers <- function(x, na.rm = TRUE)
 }
 
 #import aseg stats table (gray matter volumes)
-aseg = read_tsv("recon-all-clinical/asegtable.tsv") %>%
+aseg = read_tsv("freesurfer/asegtable.tsv") %>%
   rename(participant_id=`Measure:volume`) %>%
   mutate(across(c(2:ncol(.)), .fns = ~.*1000/EstimatedTotalIntraCranialVol)) #normalize by intracranial volume
 #import left aparc stats table (cortical thickness)
-lh_aparc = read_tsv("recon-all-clinical/lh_aparctable.tsv") %>%
+lh_aparc = read_tsv("freesurfer/lh_aparctable.tsv") %>%
   rename(participant_id=lh.aparc.thickness)
 #import right aparc stats table (cortical thickness)
-rh_aparc = read_tsv("recon-all-clinical/rh_aparctable.tsv") %>%
+rh_aparc = read_tsv("freesurfer/rh_aparctable.tsv") %>%
   rename(participant_id=rh.aparc.thickness)
 #import wmparc stats table (white matter volumes)
-wmparc = read_tsv("recon-all-clinical/wmparctable.tsv") %>%
+wmparc = read_tsv("freesurfer/wmparctable.tsv") %>%
   rename(participant_id=`Measure:volume`) %>%
   mutate(across(c(2:ncol(.)), .fns = ~.*1000/EstimatedTotalIntraCranialVol)) #normalize by intracranial volume
 #import the demographics and testing data of participants over the age of 55 with anatomical MRI scans
@@ -97,7 +97,7 @@ write2word(thickness_table, "thickness_table.docx") #save thickness table to fil
 #generate volumes table
 volumes_table <- tableby(SCD ~ `Left-Hippocampus` + `Right-Hippocampus` + 
                            `wm-lh-parahippocampal` + `wm-rh-parahippocampal` +
-                           lhCerebralWhiteMatterVol + rhCerebralWhiteMatterVol,
+                           lhCerebralWhiteMatterVol + rhCerebralWhiteMatterVol + CerebralWhiteMatterVol,
                          data = volumes_thickness, total = FALSE)
 summary(volumes_table, text = TRUE) #view
 write2word(volumes_table, "volumes_table.docx") #save volume table to file
