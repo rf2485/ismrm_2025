@@ -47,8 +47,12 @@ for j in $(cut -f1 $projectdir/dwi_over_55_scd.tsv); do
 	fslmaths $projectdir/dwi_processed/$j/AMICO/NODDI/fit_NDI.nii.gz -nan $projectdir/tbss/NDI/scd_${j}.nii.gz
 	fslmaths $projectdir/dwi_processed/$j/AMICO/NODDI/fit_ODI.nii.gz -nan $projectdir/tbss/ODI/scd_${j}.nii.gz
 done
-rm $projectdir/tbss/scd_sub-CC620821.nii.gz
-rm $projectdir/tbss/scd_sub-CC712027.nii.gz
+rm $projectdir/tbss/ctl_sub-CC710551.nii.gz #motion
+rm $projectdir/tbss/scd_sub-CC510255.nii.gz #abnormality in temporal pole
+rm $projectdir/tbss/scd_sub-CC620821.nii.gz #large ventricles
+rm $projectdir/tbss/scd_sub-CC712027.nii.gz #parietal lobe cutoff
+rm $projectdir/tbss/*/ctl_sub-CC710551.nii.gz
+rm $projectdir/tbss/*/scd_sub-CC510255.nii.gz 
 rm $projectdir/tbss/*/scd_sub-CC620821.nii.gz
 rm $projectdir/tbss/*/scd_sub-CC712027.nii.gz
 
