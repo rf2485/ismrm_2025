@@ -17,7 +17,12 @@ mkdir $projectdir/tbss/AK
 mkdir $projectdir/tbss/FWF
 mkdir $projectdir/tbss/NDI
 mkdir $projectdir/tbss/ODI
-  
+mkdir $projectdir/tbss/Da_smi
+mkdir $projectdir/tbss/DePar_smi
+mkdir $projectdir/tbss/DePerp_smi
+mkdir $projectdir/tbss/f_smi
+mkdir $projectdir/tbss/p2_smi
+ 
 for j in $(cut -f1 $projectdir/dwi_over_55_ctl.tsv); do
 	echo "copying files for ${j}"
 	fslmaths $projectdir/dwi_processed/$j/metrics/dti_fa.nii -nan $projectdir/tbss/ctl_${j}.nii.gz
@@ -28,6 +33,11 @@ for j in $(cut -f1 $projectdir/dwi_over_55_ctl.tsv); do
 	fslmaths $projectdir/dwi_processed/$j/metrics/dki_mk.nii -nan $projectdir/tbss/MK/ctl_${j}.nii.gz
 	fslmaths $projectdir/dwi_processed/$j/metrics/dki_rk.nii -nan $projectdir/tbss/RK/ctl_${j}.nii.gz
 	fslmaths $projectdir/dwi_processed/$j/metrics/dki_ak.nii -nan $projectdir/tbss/AK/ctl_${j}.nii.gz
+	fslmaths $projectdir/dwi_processed/$j/metrics/smi_matlab_Da.nii -nan $projectdir/tbss//Da_smi/ctl_${j}.nii.gz
+	fslmaths $projectdir/dwi_processed/$j/metrics//smi_matlab_DePar.nii -nan $projectdir/tbss//DePar_smi/ctl_${j}.nii.gz
+	fslmaths $projectdir/dwi_processed/$j/metrics/smi_matlab_DePerp.nii -nan $projectdir/tbss/DePerp_smi/ctl_${j}.nii.gz
+	fslmaths $projectdir/dwi_processed/$j/metrics/smi_matlab_f.nii -nan $projectdir/tbss/f_smi/ctl_${j}.nii.gz
+	fslmaths $projectdir/dwi_processed/$j/metrics/smi_matlab_p2.nii -nan $projectdir/tbss/p2_smi/ctl_${j}.nii.gz
 	fslmaths $projectdir/dwi_processed/$j/AMICO/NODDI/fit_FWF.nii.gz -nan $projectdir/tbss/FWF/ctl_${j}.nii.gz
 	fslmaths $projectdir/dwi_processed/$j/AMICO/NODDI/fit_NDI.nii.gz -nan $projectdir/tbss/NDI/ctl_${j}.nii.gz
 	fslmaths $projectdir/dwi_processed/$j/AMICO/NODDI/fit_ODI.nii.gz -nan $projectdir/tbss/ODI/ctl_${j}.nii.gz
@@ -43,14 +53,22 @@ for j in $(cut -f1 $projectdir/dwi_over_55_scd.tsv); do
 	fslmaths $projectdir/dwi_processed/$j/metrics/dki_mk.nii -nan $projectdir/tbss/MK/scd_${j}.nii.gz
 	fslmaths $projectdir/dwi_processed/$j/metrics/dki_rk.nii -nan $projectdir/tbss/RK/scd_${j}.nii.gz
 	fslmaths $projectdir/dwi_processed/$j/metrics/dki_ak.nii -nan $projectdir/tbss/AK/scd_${j}.nii.gz
+	fslmaths $projectdir/dwi_processed/$j/metrics/smi_matlab_Da.nii -nan $projectdir/tbss//Da_smi/scd_${j}.nii.gz
+	fslmaths $projectdir/dwi_processed/$j/metrics//smi_matlab_DePar.nii -nan $projectdir/tbss//DePar_smi/scd_${j}.nii.gz
+	fslmaths $projectdir/dwi_processed/$j/metrics/smi_matlab_DePerp.nii -nan $projectdir/tbss/DePerp_smi/scd_${j}.nii.gz
+	fslmaths $projectdir/dwi_processed/$j/metrics/smi_matlab_f.nii -nan $projectdir/tbss/f_smi/scd_${j}.nii.gz
+	fslmaths $projectdir/dwi_processed/$j/metrics/smi_matlab_p2.nii -nan $projectdir/tbss/p2_smi/scd_${j}.nii.gz
 	fslmaths $projectdir/dwi_processed/$j/AMICO/NODDI/fit_FWF.nii.gz -nan $projectdir/tbss/FWF/scd_${j}.nii.gz
 	fslmaths $projectdir/dwi_processed/$j/AMICO/NODDI/fit_NDI.nii.gz -nan $projectdir/tbss/NDI/scd_${j}.nii.gz
 	fslmaths $projectdir/dwi_processed/$j/AMICO/NODDI/fit_ODI.nii.gz -nan $projectdir/tbss/ODI/scd_${j}.nii.gz
 done
-rm $projectdir/tbss/scd_sub-CC620821.nii.gz
-rm $projectdir/tbss/scd_sub-CC712027.nii.gz
-rm $projectdir/tbss/*/scd_sub-CC620821.nii.gz
-rm $projectdir/tbss/*/scd_sub-CC712027.nii.gz
+
+problem_subjs=( ctl_sub-CC420222 ctl_sub-CC520175 ctl_sub-CC520200 ctl_sub-CC520287 ctl_sub-CC610568 ctl_sub-CC610653 ctl_sub-CC620413 ctl_sub-CC620466 ctl_sub-CC620515 ctl_sub-CC620619 ctl_sub-CC621011 ctl_sub-CC621118 ctl_sub-CC621642 ctl_sub-CC710131 ctl_sub-CC710551 ctl_sub-CC711158 ctl_sub-CC720188 ctl_sub-CC720646 ctl_sub-CC721292 ctl_sub-CC722536 scd_sub-CC510039 scd_sub-CC510076 scd_sub-CC510639 scd_sub-CC520078 scd_sub-CC520127 scd_sub-CC520197 scd_sub-CC620429 scd_sub-CC620444 scd_sub-CC620821 scd_sub-CC710350 scd_sub-CC712027 scd_sub-CC720670 scd_sub-CC721532 )
+for subj in "${problem_subjs[@]}"; do
+	echo "removing ${subj}"
+	rm $projectdir/tbss/${subj}.nii.gz
+	rm $projectdir/tbss/*/${subj}.nii.gz
+done
 
 cd $projectdir/tbss
 tbss_1_preproc *.nii.gz
@@ -66,5 +84,5 @@ most_recent_job=$(squeue -u rf2485 --nohead --format %F | head -n 1)
 fsl_sub -T 239 -R 32 -j $most_recent_job -l tbss_logs -t $projectdir/tbss_non_FA_array.txt
 most_recent_job=$(squeue -u rf2485 --nohead --format %F | head -n 1)
 cd $projectdir/tbss/stats
-design_ttest2 design 198 125
+design_ttest2 design 177 114
 fsl_sub -T 239 -R 64 -j $most_recent_job -l tbss_logs -t $projectdir/randomise_array.txt

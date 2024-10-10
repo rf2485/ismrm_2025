@@ -8,7 +8,7 @@
 #SBATCH --time=12:00:00
 #SBATCH --mem=32G
 #SBATCH --array=1-325
-#SBATCH -o ./slurm_output/7_process_dwi/slurm-%A_%a.out
+#SBATCH -o ./slurm_output/3_process_dwi/slurm-%A_%a.out
 
 basedir=/gpfs/data/lazarlab/CamCan995/
 projectdir=$basedir/derivatives/designer_tbss/
@@ -41,7 +41,7 @@ singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrconvert $d
 
 #denoise, degibbs, and normalize with designer
 rm -rf $designerdir/tmp
-singularity exec --nv --bind $basedir $basedir/designer2_latest.sif designer -denoise -shrinkage frob -adaptive_patch -degibbs -nthreads 4 -nocleanup -scratch $designerdir/tmp $designerdir/dwi_raw.nii $intdir/2_dwi_degibbs.nii
+singularity exec --nv --bind $basedir $basedir/designer2_v2.0.10.sif designer -denoise -shrinkage frob -adaptive_patch -degibbs -nthreads 4 -nocleanup -scratch $designerdir/tmp $designerdir/dwi_raw.nii $intdir/2_dwi_degibbs.nii
 
 #move denoised files and calculate residual
 mv $designerdir/tmp/sigma.nii $designerdir/noisemap.nii
@@ -109,7 +109,7 @@ mri_synthstrip -i meanb0.nii -m new_brain_mask.nii
 #csf mask, csf-excluded smoothing, rician bias correction, and model fitting with pydesigner
 cd $designerdir
 mkdir -p $designerdir/metrics_qc/fitting
-singularity exec --bind $basedir/ $basedir/neurodock_latest.sif pydesigner --resume -n -u -cd 2 -z -r --fit_constraints 0,0,0 --akc --user_mask $designerdir/tmp/new_brain_mask.nii --verbose --noqc --nthreads 4 -o $designerdir/ $rawdwi.nii.gz
+singularity exec --bind $basedir/ $basedir/neurodock_latest.sif pydesigner --resume -n -u -cd 2 -z -r --user_mask $designerdir/tmp/new_brain_mask.nii --verbose --noqc --nthreads 4 -o $designerdir/ $rawdwi.nii.gz
 rm -rf $designerdir/tmp/
 
 ##calculate colormap from diffusion tensor
@@ -119,3 +119,13 @@ singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif tensor2metri
 conda deactivate
 source activate ~/.conda/envs/amico/
 python3 $projectdir/amico_noddi.py $j
+
+#fit SMI model using matlab
+module load matlab/R2024a
+matlab -sd $designerdir -batch "addpath('${basedir}/SMI'); nii = niftiread('dwi_preprocessed.nii'); dwi = abs(double(nii)); bval = load('dwi_preprocessed.bval'); dirs = load('dwi_preprocessed.bvec'); nii_mask = niftiread('brain_mask.nii'); sigma_nii = niftiread('noisemap.nii'); options.b = bval; options.beta = []; options.dirs = dirs; options.TE   = []; options.MergeDistance = 0.1; options.mask = logical(nii_mask); options.sigma = abs(sigma_nii); options.compartments = {'IAS','EAS'}; options.NoiseBias = 'Rician'; options.MLTraining.bounds = [0.05, 1, 1, 0.1, 0, 50, 50, 0.05; 0.95, 3, 3, 1.2, 0.5, 150, 120, 0.99]; [out] = SMI.fit(dwi,options); niftiwrite(out.kernel(:,:,:,1), 'metrics/smi_matlab_f.nii'); niftiwrite(out.kernel(:,:,:,2), 'metrics/smi_matlab_Da.nii'); niftiwrite(out.kernel(:,:,:,3), 'metrics/smi_matlab_DePar.nii'); niftiwrite(out.kernel(:,:,:,4), 'metrics/smi_matlab_DePerp.nii'); niftiwrite(out.kernel(:,:,:,6), 'metrics/smi_matlab_p2.nii');"
+
+fslcpgeom $designerdir/dwi_preprocessed.nii $designerdir/metrics/smi_matlab_f.nii -d
+fslcpgeom $designerdir/dwi_preprocessed.nii $designerdir/metrics/smi_matlab_Da.nii -d
+fslcpgeom $designerdir/dwi_preprocessed.nii $designerdir/metrics/smi_matlab_DePar.nii -d
+fslcpgeom $designerdir/dwi_preprocessed.nii $designerdir/metrics/smi_matlab_DePerp.nii -d
+fslcpgeom $designerdir/dwi_preprocessed.nii $designerdir/metrics/smi_matlab_p2.nii -d
