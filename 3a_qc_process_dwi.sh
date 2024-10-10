@@ -13,7 +13,7 @@ subj_list=($subj_list)
 mkdir -p $dwidir/group_qc/intermediate_nifti
 mkdir -p $dwidir/group_qc/metrics
 
-nii_list=( dwi_raw noisemap residual intermediate_nifti/1_dwi_denoised intermediate_nifti/2_dwi_degibbs intermediate_nifti/2_dwi_undistorted intermediate_nifti/3_dwi_smoothed intermediate_nifti/4_dwi_rician B0 B1000 B2000 metrics/dti_md metrics/dti_rd metrics/dti_ad metrics/dki_mk metrics/dki_rk metrics/dki_ak metrics/dki_kfa metrics/dki_mkt metrics/wmti_awf metrics/wmti_eas_ad metrics/wmti_eas_rd metrics/wmti_eas_tort metrics/wmti_ias_da )
+nii_list=( dwi_raw noisemap residual intermediate_nifti/1_dwi_denoised intermediate_nifti/2_dwi_degibbs intermediate_nifti/2_dwi_undistorted intermediate_nifti/3_dwi_smoothed intermediate_nifti/4_dwi_rician B0 B1000 B2000 metrics/dti_md metrics/dti_rd metrics/dti_ad metrics/dki_mk metrics/dki_rk metrics/dki_ak metrics/dki_kfa metrics/dki_mkt metrics/wmti_awf metrics/wmti_eas_ad metrics/wmti_eas_rd metrics/wmti_eas_tort metrics/wmti_ias_da metrics/smi_matlab_Da metrics/smi_matlab_DePar metrics/smi_matlab_DePerp metrics/smi_matlab_f metrics/smi_matlab_p2 )
 for i in "${nii_list[@]}"; do
 	slicesdir $dwidir/*/${i}.nii
 	rm -rf $dwidir/group_qc/$i
