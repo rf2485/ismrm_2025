@@ -63,29 +63,15 @@ for j in $(cut -f1 $projectdir/dwi_over_55_scd.tsv); do
 	fslmaths $projectdir/dwi_processed/$j/AMICO/NODDI/fit_ODI.nii.gz -nan $projectdir/tbss/ODI/scd_${j}.nii.gz
 done
 
-# problem_subjs=( ctl_sub-CC420222 scd_sub-CC510076 scd_sub-CC520078 ctl_sub-CC520200 ctl_sub-CC610568 ctl_sub-CC610653 ctl_sub-CC620413 scd_sub-CC620429 scd_sub-CC620444 ctl_sub-CC620515 scd_sub-CC620821 ctl_sub-CC621011  ctl_sub-CC621642 ctl_sub-CC710131 ctl_sub-CC710551 ctl_sub-CC711158 ctl_sub-CC720646 ctl_sub-CC721292 ctl_sub-CC722536 )
-# #621011, 721292, 620821  big ventricles causing errors in registration to template
-# #620515 pathology L hemi causing errors in registration to template
-# #all others: motion artifacts causing errors in diffusion kurtosis measurement
-# for subj in "${problem_subjs[@]}"; do
-# 	echo "removing ${subj}"
-# 	rm $projectdir/tbss/${subj}.nii.gz
-# 	rm $projectdir/tbss/*/${subj}.nii.gz
-# done
-# ctl_sub-CC520175
-# ctl_sub-CC520287
-# ctl_sub-CC620466
-# ctl_sub-CC620619
-# ctl_sub-CC621118
-# ctl_sub-CC720188
-# scd_sub-CC510039
-# scd_sub-CC510639
-# scd_sub-CC520127
-# scd_sub-CC520197
-# scd_sub-CC710350
-# scd_sub-CC712027
-# scd_sub-CC720670
-# scd_sub-CC721532
+problem_subjs=( scd_sub-CC510255 scd_sub-CC620821 ctl_sub-CC621011 ctl_sub-CC721292 )
+# 510255 has pathology in the L temporal lobe causing errors in registration to template
+# 620821, 621011, and 721292 have big ventricles, causing errors in registration to template
+for subj in "${problem_subjs[@]}"; do
+	echo "removing ${subj}"
+	rm $projectdir/tbss/${subj}.nii.gz
+	rm $projectdir/tbss/*/${subj}.nii.gz
+done
+
 cd $projectdir/tbss
 tbss_1_preproc *.nii.gz
 rm -rf $projectdir/dwi_processed/group_qc/metrics/dti_fa
@@ -97,8 +83,8 @@ fsl_sub -T 239 -R 32 -j $most_recent_job -l tbss_logs tbss_3_postreg -S
 most_recent_job=$(squeue -u rf2485 --nohead --format %F | head -n 1)
 fsl_sub -T 239 -R 32 -j $most_recent_job -l tbss_logs tbss_4_prestats 0.3
 most_recent_job=$(squeue -u rf2485 --nohead --format %F | head -n 1)
-fsl_sub -T 239 -R 32 -j $most_recent_job -l tbss_logs -t $projectdir/tbss_non_FA_array.txt
+fsl_sub -T 239 -R 64 -j $most_recent_job -l tbss_logs -t $projectdir/tbss_non_FA_array
 most_recent_job=$(squeue -u rf2485 --nohead --format %F | head -n 1)
 cd $projectdir/tbss/stats
-design_ttest2 design 177 114
-fsl_sub -T 239 -R 64 -j $most_recent_job -l tbss_logs -t $projectdir/randomise_array.txt
+design_ttest2 design 196 125
+fsl_sub -T 239 -R 64 -j $most_recent_job -l tbss_logs -t $projectdir/randomise_array

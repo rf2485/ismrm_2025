@@ -9,3 +9,4 @@ for (subj in dwi_over_55$participant_id) {
 }
 motion <- dwi_over_55 %>% select(participant_id, abs_motion_mean, rel_motion_mean) %>%
   filter(rel_motion_mean > 0.34 & abs_motion_mean > 2)
+print(motion$participant_id)
