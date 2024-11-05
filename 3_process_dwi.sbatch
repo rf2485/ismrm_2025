@@ -82,6 +82,47 @@ fdt_rotate_bvecs dwi.bvec dwi_post_eddy.bvec dwi_post_eddy.ecclog
 ##convert eddy_correct output
 singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrconvert dwi_post_eddy.nii.gz dwi_post_eddy.mif -json_import dwi.json -fslgrad dwi_post_eddy.bvec dwi.bval
 
+#quantify motion
+logfile=dwi_post_eddy.ecclog
+basenm=`basename $logfile .ecclog`
+nums=`grep -n 'Final' $logfile | sed 's/:.*//'`
+
+touch grot_ts.txt
+touch grot.mat
+
+firsttime=yes;
+m=1;
+for n in $nums ; do 
+    echo "Timepoint $m"
+    n1=`echo $n + 1 | bc` ; 
+    n2=`echo $n + 5 | bc` ;
+    sed -n  "$n1,${n2}p" $logfile > grot.mat ; 
+    if [ $firsttime = yes ] ; then firsttime=no; cp grot.mat grot.refmat ; cp grot.mat grot.oldmat ; fi
+    absval=`rmsdiff grot.mat grot.refmat $basenm`;
+    relval=`rmsdiff grot.mat grot.oldmat $basenm`;
+    cp grot.mat grot.oldmat
+    echo $absval $relval >> ec_disp.txt ;
+    avscale --allparams grot.mat $basenm | grep 'Rotation Angles' | sed 's/.* = //' >> ec_rot.txt ;
+    avscale --allparams grot.mat $basenm | grep 'Translations' | sed 's/.* = //' >> ec_trans.txt ;
+    m=`echo $m + 1 | bc`;
+done
+
+echo "absolute" > grot_labels.txt
+echo "relative" >> grot_labels.txt
+
+fsl_tsplot -i ec_disp.txt -t 'Eddy Current estimated mean displacement (mm)' -l grot_labels.txt -o ec_disp.png
+
+echo "x" > grot_labels.txt
+echo "y" >> grot_labels.txt
+echo "z" >> grot_labels.txt
+
+fsl_tsplot -i ec_rot.txt -t 'Eddy Current estimated rotations (radians)' -l grot_labels.txt -o ec_rot.png
+fsl_tsplot -i ec_trans.txt -t 'Eddy Current estimated translations (mm)' -l grot_labels.txt -o ec_trans.png
+
+mkdir -p $designerdir/metrics_qc/eddy
+cp ec* $designerdir/metrics_qc/eddy/
+cp dwi_post_eddy.ecclog $designerdir/metrics_qc/eddy/
+
 #prepare for topup
 ##replace first b0 of se_epi with first b0 of dwi
 singularity exec --nv --bind $basedir $basedir/neurodock_latest.sif mrconvert dwi_post_eddy.mif dwi_first_bzero.mif -coord 3 0 -axes 0,1,2
