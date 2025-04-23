@@ -151,6 +151,8 @@ fi
 
 if [ ! -f $designerdir/metrics/dki_dsistudio.fib ] && [ -f $rawdwi.nii.gz ]; then
 	#brain mask
+	mkdir -p $designerdir/tmp/
+	cd $designerdir/tmp
 	singularity exec --bind $basedir/ $basedir/neurodock_v1.0.0.sif dwiextract $designerdir/working.mif - -bzero | singularity exec --bind $basedir/ $basedir/neurodock_v1.0.0.sif mrmath - mean - -axis 3 | singularity exec --bind $basedir/ $basedir/neurodock_v1.0.0.sif mrconvert - meanb0.nii
 	mri_synthstrip -i meanb0.nii -m new_brain_mask.nii
 
