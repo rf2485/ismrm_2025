@@ -161,6 +161,7 @@ if [ ! -f $designerdir/metrics/dki_dsistudio.fib ] && [ -f $rawdwi.nii.gz ]; the
 	mkdir -p $designerdir/metrics_qc/fitting
 	rm $designerdir/csf_mask.nii
 	rm $designerdir/S*
+	rm $designerdir/B*
 	singularity exec --bind $basedir/ $basedir/neurodock_v1.0.0.sif pydesigner --resume -n -u -cd 2 -z -r --user_mask $designerdir/tmp/new_brain_mask.nii --verbose --noqc --nthreads 4 -o $designerdir/ $rawdwi.nii.gz
 	rm -rf $designerdir/tmp/
 fi
