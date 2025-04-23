@@ -1,5 +1,5 @@
 basedir=/gpfs/data/lazarlab/CamCan995/
-projectdir=$basedir/derivatives/designer_tbss/
+projectdir=$basedir/derivatives/scd/ismrm_2025
 
 module load singularity/3.9.8
 module load miniconda3/gpu/4.9.2
