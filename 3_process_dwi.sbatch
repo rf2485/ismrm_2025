@@ -176,15 +176,15 @@ if [ ! -f $designerdir/metrics/smi_matlab_p2.nii ] && [ -f $rawdwi.nii.gz ]; the
 	#fit SMI model using matlab
 	module load matlab/R2024a
 	matlab -sd $designerdir -batch "addpath('${basedir}/SMI'); nii = niftiread('dwi_preprocessed.nii'); dwi = abs(double(nii)); bval = load('dwi_preprocessed.bval'); dirs = load('dwi_preprocessed.bvec'); nii_mask = niftiread('brain_mask.nii'); sigma_nii = niftiread('noisemap.nii'); options.b = bval; options.beta = []; options.dirs = dirs; options.TE   = []; options.MergeDistance = 0.1; options.mask = logical(nii_mask); options.sigma = abs(sigma_nii); options.compartments = {'IAS','EAS'}; options.NoiseBias = 'Rician'; options.MLTraining.bounds = [0.05, 1, 1, 0.1, 0, 50, 50, 0.05; 0.95, 3, 3, 1.2, 0.5, 150, 120, 0.99]; [out] = SMI.fit(dwi,options); niftiwrite(out.kernel(:,:,:,1), 'metrics/smi_matlab_f.nii'); niftiwrite(out.kernel(:,:,:,2), 'metrics/smi_matlab_Da.nii'); niftiwrite(out.kernel(:,:,:,3), 'metrics/smi_matlab_DePar.nii'); niftiwrite(out.kernel(:,:,:,4), 'metrics/smi_matlab_DePerp.nii'); niftiwrite(out.kernel(:,:,:,6), 'metrics/smi_matlab_p2.nii');"
-	
-	conda deactivate
-	source activate ~/.conda/envs/fsl_eddy/ #switch back to FSL eddy conda env
-	export FSLDIR=$CONDA_PREFIX
-	source $FSLDIR/etc/fslconf/fsl.sh
-	#copy headers to SMI output images
-	fslcpgeom $designerdir/dwi_preprocessed.nii $designerdir/metrics/smi_matlab_f.nii -d
-	fslcpgeom $designerdir/dwi_preprocessed.nii $designerdir/metrics/smi_matlab_Da.nii -d
-	fslcpgeom $designerdir/dwi_preprocessed.nii $designerdir/metrics/smi_matlab_DePar.nii -d
-	fslcpgeom $designerdir/dwi_preprocessed.nii $designerdir/metrics/smi_matlab_DePerp.nii -d
-	fslcpgeom $designerdir/dwi_preprocessed.nii $designerdir/metrics/smi_matlab_p2.nii -d
 fi
+
+conda deactivate
+source activate ~/.conda/envs/fsl_eddy/ #switch back to FSL eddy conda env
+export FSLDIR=$CONDA_PREFIX
+source $FSLDIR/etc/fslconf/fsl.sh
+#copy headers to SMI output images
+fslcpgeom $designerdir/dwi_preprocessed.nii $designerdir/metrics/smi_matlab_f.nii -d
+fslcpgeom $designerdir/dwi_preprocessed.nii $designerdir/metrics/smi_matlab_Da.nii -d
+fslcpgeom $designerdir/dwi_preprocessed.nii $designerdir/metrics/smi_matlab_DePar.nii -d
+fslcpgeom $designerdir/dwi_preprocessed.nii $designerdir/metrics/smi_matlab_DePerp.nii -d
+fslcpgeom $designerdir/dwi_preprocessed.nii $designerdir/metrics/smi_matlab_p2.nii -d
