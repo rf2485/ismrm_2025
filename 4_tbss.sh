@@ -74,8 +74,6 @@ done
 
 cd $projectdir/tbss
 tbss_1_preproc *.nii.gz
-rm -rf $projectdir/dwi_processed/group_qc/metrics/dti_fa
-cp -r $projectdir/tbss/FA/slicesdir $projectdir/dwi_processed/group_qc/metrics/dti_fa
 tbss_2_reg -T
 most_recent_job=$(squeue -u rf2485 --nohead --format %F | head -n 1)
 fsl_sub -T 239 -R 32 -j $most_recent_job -l tbss_logs tbss_3_postreg -S
