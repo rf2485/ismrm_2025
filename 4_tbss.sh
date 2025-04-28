@@ -5,73 +5,53 @@ module load miniconda3/gpu/4.9.2
 source activate ~/.conda/envs/fsl_eddy/
 export FSLDIR=$CONDA_PREFIX
 source $FSLDIR/etc/fslconf/fsl.sh
+module load r/4.3.2
 
-mkdir -p $projectdir/tbss/stats
-mkdir $projectdir/tbss/MD
-mkdir $projectdir/tbss/RD
-mkdir $projectdir/tbss/AxD
-mkdir $projectdir/tbss/KFA
-mkdir $projectdir/tbss/MK
-mkdir $projectdir/tbss/RK
-mkdir $projectdir/tbss/AK
-mkdir $projectdir/tbss/FWF
-mkdir $projectdir/tbss/NDI
-mkdir $projectdir/tbss/ODI
-mkdir $projectdir/tbss/Da_smi
-mkdir $projectdir/tbss/DePar_smi
-mkdir $projectdir/tbss/DePerp_smi
-mkdir $projectdir/tbss/f_smi
-mkdir $projectdir/tbss/p2_smi
- 
-for j in $(cut -f1 $projectdir/dwi_over_55_ctl.tsv); do
-	echo "copying files for ${j}"
-	fslmaths $projectdir/dwi_processed/$j/metrics/dti_fa.nii -nan $projectdir/tbss/ctl_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/dti_md.nii -nan $projectdir/tbss/MD/ctl_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/dti_rd.nii -nan $projectdir/tbss/RD/ctl_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/dti_ad.nii -nan $projectdir/tbss/AxD/ctl_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/dki_kfa.nii -nan $projectdir/tbss/KFA/ctl_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/dki_mk.nii -nan $projectdir/tbss/MK/ctl_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/dki_rk.nii -nan $projectdir/tbss/RK/ctl_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/dki_ak.nii -nan $projectdir/tbss/AK/ctl_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/smi_matlab_Da.nii -nan $projectdir/tbss//Da_smi/ctl_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics//smi_matlab_DePar.nii -nan $projectdir/tbss//DePar_smi/ctl_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/smi_matlab_DePerp.nii -nan $projectdir/tbss/DePerp_smi/ctl_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/smi_matlab_f.nii -nan $projectdir/tbss/f_smi/ctl_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/smi_matlab_p2.nii -nan $projectdir/tbss/p2_smi/ctl_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/AMICO/NODDI/fit_FWF.nii.gz -nan $projectdir/tbss/FWF/ctl_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/AMICO/NODDI/fit_NDI.nii.gz -nan $projectdir/tbss/NDI/ctl_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/AMICO/NODDI/fit_ODI.nii.gz -nan $projectdir/tbss/ODI/ctl_${j}.nii.gz
-done
-
-for j in $(cut -f1 $projectdir/dwi_over_55_scd.tsv); do
-	echo "copying files for ${j}"
-	fslmaths $projectdir/dwi_processed/$j/metrics/dti_fa.nii -nan $projectdir/tbss/scd_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/dti_md.nii -nan $projectdir/tbss/MD/scd_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/dti_rd.nii -nan $projectdir/tbss/RD/scd_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/dti_ad.nii -nan $projectdir/tbss/AxD/scd_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/dki_kfa.nii -nan $projectdir/tbss/KFA/scd_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/dki_mk.nii -nan $projectdir/tbss/MK/scd_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/dki_rk.nii -nan $projectdir/tbss/RK/scd_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/dki_ak.nii -nan $projectdir/tbss/AK/scd_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/smi_matlab_Da.nii -nan $projectdir/tbss//Da_smi/scd_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics//smi_matlab_DePar.nii -nan $projectdir/tbss//DePar_smi/scd_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/smi_matlab_DePerp.nii -nan $projectdir/tbss/DePerp_smi/scd_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/smi_matlab_f.nii -nan $projectdir/tbss/f_smi/scd_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/metrics/smi_matlab_p2.nii -nan $projectdir/tbss/p2_smi/scd_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/AMICO/NODDI/fit_FWF.nii.gz -nan $projectdir/tbss/FWF/scd_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/AMICO/NODDI/fit_NDI.nii.gz -nan $projectdir/tbss/NDI/scd_${j}.nii.gz
-	fslmaths $projectdir/dwi_processed/$j/AMICO/NODDI/fit_ODI.nii.gz -nan $projectdir/tbss/ODI/scd_${j}.nii.gz
-done
-
-problem_subjs=( scd_sub-CC510255 scd_sub-CC620821 ctl_sub-CC621011 ctl_sub-CC721292 )
+problem_subjs=( scd_sub-CC510255 scd_sub-CC620821 ctl_sub-CC510438 ctl_sub-CC621011 ctl_sub-CC710551 ctl_sub-CC721292 )
 # 510255 has pathology in the L temporal lobe causing errors in registration to template
+# sub-CC510438 has pathology in L frontal lobe
+# sub-CC710551 has motion artifacts in DWI
 # 620821, 621011, and 721292 have big ventricles, causing errors in registration to template
+
+meas_list=( dki_ak dki_kfa dki_mk dki_mkt dki_rk dti_ad dti_fa dti_md dti_rd smi_matlab_f smi_matlab_Da smi_matlab_DePar smi_matlab_DePerp smi_matlab_p2 wm_fit_FWF wm_fit_NDI wm_fit_ODI )
+
+#create stats contrasts and matrices
+mkdir -p $projectdir/tbss/stats
+mkdir -p $projectdir/tbss_ctl/stats
+mkdir -p $projectdir/tbss_scd/stats
+Rscript fsl_glm_matrices.R
+
+#copy FA files to TBSS folder
+for j in $(cut -f1 $projectdir/dwi_over_55_ctl.tsv); do
+	echo "copying non-masked FA files for ${j} for constructing the WM skeleton"
+	fslmaths $projectdir/freesurfer/$j/diffusion/dti_fa.nii.gz -nan $projectdir/tbss/ctl_${j}.nii.gz
+done
+for j in $(cut -f1 $projectdir/dwi_over_55_scd.tsv); do
+	echo "copying non-masked FA files for ${j} for constructing the WM skeleton"
+	fslmaths $projectdir/freesurfer/$j/diffusion/dti_fa.nii.gz -nan $projectdir/tbss/scd_${j}.nii.gz
+done
+
+#copy non-FA diffusion files to TBSS folder
+for meas in "${meas_list[@]}"; do
+	mkdir -p $projectdir/tbss/$meas
+	for j in $(cut -f1 $projectdir/dwi_over_55_ctl.tsv); do
+		echo "copying ${meas} files for ${j}"
+		fslmaths $projectdir/freesurfer/$j/diffusion/${meas}_masked_wm.nii.gz -nan $projectdir/tbss/$meas/ctl_${j}.nii.gz
+	done
+	for j in $(cut -f1 $projectdir/dwi_over_55_scd.tsv); do
+		echo "copying ${meas} files for ${j}"
+		fslmaths $projectdir/freesurfer/$j/diffusion/${meas}_masked_wm.nii.gz -nan $projectdir/tbss/$meas/scd_${j}.nii.gz
+	done
+done
+
+#remove problem subjects
 for subj in "${problem_subjs[@]}"; do
 	echo "removing ${subj}"
 	rm $projectdir/tbss/${subj}.nii.gz
 	rm $projectdir/tbss/*/${subj}.nii.gz
 done
 
+#complete TBSS pipeline
 cd $projectdir/tbss
 tbss_1_preproc *.nii.gz
 tbss_2_reg -T
@@ -81,8 +61,16 @@ fsl_sub -T 239 -R 32 -j $most_recent_job -l tbss_logs tbss_3_postreg -S
 most_recent_job=$(squeue -u rf2485 --nohead --format %F | head -n 1)
 fsl_sub -T 239 -R 32 -j $most_recent_job -l tbss_logs tbss_4_prestats 0.3
 most_recent_job=$(squeue -u rf2485 --nohead --format %F | head -n 1)
-fsl_sub -T 239 -R 64 -j $most_recent_job -l tbss_logs -t $projectdir/tbss_non_FA_array
+fsl_sub -T 239 -R 64 -j $most_recent_job -l tbss_logs -t $projectdir/dwi_non_FA_array
 most_recent_job=$(squeue -u rf2485 --nohead --format %F | head -n 1)
+
+#stats
 cd $projectdir/tbss/stats
-design_ttest2 design 196 125
-fsl_sub -T 239 -R 64 -j $most_recent_job -l tbss_logs -t $projectdir/randomise_array
+design_ttest2 design 194 125
+Text2Vest interaction_con.txt interaction.con
+int_test_list=(memory_int age_int)
+for test in "${int_test_list[@]}"; do
+	Text2Vest ${test}_mat.txt ${test}.mat
+	mkdir ${test}
+done
+fsl_sub -T 719 -R 64 -j $most_recent_job -l tbss_logs -t $projectdir/dwi_randomise_array

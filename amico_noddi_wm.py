@@ -2,7 +2,7 @@ import os
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 import amico
 import sys
-study="/gpfs/data/lazarlab/CamCan995/derivatives/scd/ismrm_2025/dwi_processed/"
+study="/gpfs/data/lazarlab/CamCan995/derivatives/scd/camcan_scd/dwi_processed/"
 subject=sys.argv[1]
 amico.core.setup()
 ae = amico.Evaluation(study, subject)
@@ -16,4 +16,3 @@ ae.generate_kernels()
 ae.load_kernels()
 ae.fit()
 ae.save_results()
-
